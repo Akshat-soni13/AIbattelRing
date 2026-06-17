@@ -8,5 +8,5 @@ app.get("/", async (req,res)=>{
     
     const result = await runGraph("What is Factorial Code")
 
-   return  res.json(result)
+   res.json(result)
 })

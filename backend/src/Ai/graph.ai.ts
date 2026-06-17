@@ -3,7 +3,7 @@ import z from "zod"
 import { mistralModel, cohereModel, geminiModel } from "./model.ai.js";
 import { createAgent, HumanMessage, providerStrategy,toolStrategy } from "langchain";
 import { start } from "node:repl";
-// NOte -=> Agar gemnin model use to create agent te we can use Provider Strategy but but but if we want to use another model to create an Agent hen we haveto use toolStrategy 
+// NOte -= Agar gemnin model use to create agent te we can use Provider Strategy but but but if we want to use another model to create an Agent hen we haveto use toolStrategy 
 
 
 
@@ -45,7 +45,7 @@ import { start } from "node:repl";
 
         const judge =  createAgent({
             model:geminiModel,
-            responseFormat: providerStrategy(z.object({
+            responseFormat: toolStrategy(z.object({
                 solution_1_score : z.number().min(0).max(10),
                 solution_2_score: z.number().min(0).max(120),
                 solution_1_reasoning: z.string(),
@@ -83,11 +83,12 @@ import { start } from "node:repl";
 
     const graph = new StateGraph(state)
     .addNode("Solution",solutionNode)
-    .addNode("judge",judgeNode)
+    .addNode("judgeNode",judgeNode)
     // ya ha toh hamen grpah me node add kardi lekin edge ki direction bata ni baki hai woh nicha karraha hai dekho
     .addEdge(START,"Solution")
-    .addEdge("Solution","judge")
-    .addEdge("judge",END)
+    .addEdge("Solution","judgeNode")
+    .addEdge("judgeNode",END)
+    .compile()
 
     // both Edges and Nodes Added and Grpah Created 
 
@@ -100,5 +101,6 @@ import { start } from "node:repl";
         
         return result 
         // problem sw Q invoke kyiya Donubt 
+        
 
     }
