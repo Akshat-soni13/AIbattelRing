@@ -44,7 +44,7 @@ import { start } from "node:repl";
         const {problem,solution_1,solution_2} = state
 
         const judge =  createAgent({
-            model:geminiModel,
+            model:mistralModel,
             responseFormat: toolStrategy(z.object({
                 solution_1_score : z.number().min(0).max(10),
                 solution_2_score: z.number().min(0).max(120),

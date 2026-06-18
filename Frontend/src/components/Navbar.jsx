@@ -1,74 +1,138 @@
 import React from 'react';
 
-const Navbar = ({ currentScreen, setCurrentScreen, historyCount, onNewBattle }) => {
+// ─────────────────────────────────────────────────────────────
+// Navbar — Pokémon-style top navigation bar
+//
+// Props:
+//   currentScreen  string
+//   setCurrentScreen fn
+//   historyCount   number
+//   onNewBattle    fn
+// ─────────────────────────────────────────────────────────────
+const Navbar = ({ currentScreen, setCurrentScreen, historyCount = 0, onNewBattle }) => {
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-purple-500/20 bg-dark/70 backdrop-blur-md px-6 py-4 flex items-center justify-between">
-      {/* Left side: Logo */}
-      <div 
-        className="flex items-center gap-2 cursor-pointer group"
-        onClick={() => setCurrentScreen('arena')}
+    <nav
+      style={{
+        background: '#0a0a20',
+        borderBottom: '4px solid var(--menu-border)',
+        padding: '0 16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 54,
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        flexShrink: 0,
+      }}
+    >
+      {/* Logo */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          cursor: 'pointer',
+        }}
+        onClick={() => { setCurrentScreen('arena'); onNewBattle?.(); }}
       >
-        <div className="relative">
-          <svg className="w-8 h-8 text-neon-purple filter drop-shadow-[0_0_8px_#8b5cf6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          {/* Neon echo behind icon */}
-          <svg className="absolute top-0 left-0 w-8 h-8 text-neon-purple opacity-40 blur-sm scale-110 group-hover:scale-125 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
+        {/* Mini Pokéball */}
+        <div
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: '50%',
+            border: '2px solid #444',
+            overflow: 'hidden',
+            position: 'relative',
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%', background: '#e03030' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: '#eee' }} />
+          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 3, background: '#333', transform: 'translateY(-50%)', zIndex: 1 }} />
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 8, height: 8, borderRadius: '50%',
+            background: '#eee', border: '2px solid #333',
+            zIndex: 2,
+          }} />
         </div>
-        
-        <span className="font-heading font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-electric-cyan to-battle-red glow-text-purple uppercase transition-all duration-300 group-hover:opacity-90">
-          AI Battle Arena
+        <span style={{ fontFamily: 'var(--px-font)', fontSize: 9, color: '#ffffff', letterSpacing: 1 }}>
+          AI ARENA
         </span>
       </div>
 
-      {/* Middle: Screen Toggle Tabs */}
-      <div className="flex items-center gap-2 bg-black/40 p-1 rounded-lg border border-white/5">
-        <button
+      {/* Nav Tabs */}
+      <div style={{ display: 'flex', gap: 4 }}>
+        <NavTab
+          id="tab-arena"
+          label="⚔️ BATTLE"
+          active={currentScreen === 'arena'}
           onClick={() => setCurrentScreen('arena')}
-          className={`px-4 py-1.5 rounded-md font-heading text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
-            currentScreen === 'arena'
-              ? 'bg-neon-purple/20 text-neon-purple border border-neon-purple/40 shadow-[0_0_10px_rgba(139,92,246,0.3)]'
-              : 'text-gray-400 hover:text-gray-200 border border-transparent'
-          }`}
-        >
-          Battle Arena
-        </button>
-        <button
+        />
+        <NavTab
+          id="tab-history"
+          label={`📜 HISTORY${historyCount ? ` (${historyCount})` : ''}`}
+          active={currentScreen === 'history'}
           onClick={() => setCurrentScreen('history')}
-          className={`px-4 py-1.5 rounded-md font-heading text-xs font-semibold tracking-wider uppercase transition-all duration-300 flex items-center gap-2 ${
-            currentScreen === 'history'
-              ? 'bg-neon-purple/20 text-neon-purple border border-neon-purple/40 shadow-[0_0_10px_rgba(139,92,246,0.3)]'
-              : 'text-gray-400 hover:text-gray-200 border border-transparent'
-          }`}
-        >
-          <span>History</span>
-          {historyCount > 0 && (
-            <span className="bg-neon-purple/30 text-neon-purple border border-neon-purple/50 px-1.5 py-0.5 text-[10px] font-bold rounded-full min-w-4 text-center">
-              {historyCount}
-            </span>
-          )}
-        </button>
+        />
       </div>
 
-      {/* Right side: New Battle button */}
-      <div>
-        <button
-          onClick={onNewBattle}
-          className="relative group overflow-hidden px-5 py-2 rounded-lg bg-gradient-to-r from-neon-purple to-purple-800 font-heading text-xs font-bold tracking-wider text-white uppercase shadow-[0_0_15px_rgba(139,92,246,0.4)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(139,92,246,0.7)] hover:scale-105 active:scale-95"
-        >
-          <span className="relative z-10 flex items-center gap-1.5">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            New Battle
-          </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-electric-cyan to-neon-purple opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </button>
-      </div>
+      {/* New Battle button */}
+      <button
+        id="btn-navbar-new"
+        onClick={() => { setCurrentScreen('arena'); onNewBattle?.(); }}
+        style={{
+          background: 'transparent',
+          border: '2px solid var(--box-border)',
+          borderRadius: 6,
+          padding: '6px 12px',
+          fontFamily: 'var(--px-font)',
+          fontSize: 7,
+          color: '#a0a8d8',
+          cursor: 'pointer',
+          letterSpacing: 1,
+          transition: 'all 0.15s',
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.borderColor = '#6080f0';
+          e.target.style.color = '#fff';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.borderColor = 'var(--box-border)';
+          e.target.style.color = '#a0a8d8';
+        }}
+      >
+        + NEW
+      </button>
     </nav>
   );
 };
+
+const NavTab = ({ id, label, active, onClick }) => (
+  <button
+    id={id}
+    onClick={onClick}
+    style={{
+      background: active ? '#1e2858' : 'transparent',
+      border: 'none',
+      borderBottom: active ? '3px solid var(--poke-blue)' : '3px solid transparent',
+      padding: '6px 12px',
+      fontFamily: 'var(--px-font)',
+      fontSize: 7,
+      color: active ? '#fff' : '#6068a8',
+      cursor: 'pointer',
+      letterSpacing: 1,
+      transition: 'all 0.15s',
+      borderRadius: '4px 4px 0 0',
+    }}
+    onMouseEnter={(e) => { if (!active) e.target.style.color = '#a0a8d8'; }}
+    onMouseLeave={(e) => { if (!active) e.target.style.color = '#6068a8'; }}
+  >
+    {label}
+  </button>
+);
 
 export default Navbar;

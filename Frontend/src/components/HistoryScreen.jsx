@@ -1,121 +1,172 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-const HistoryScreen = ({ historyList, onSelectBattle }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Filter history list based on search query
-  const filteredHistory = historyList.filter((battle) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      battle.prompt.toLowerCase().includes(query) ||
-      battle.winner.toLowerCase().includes(query)
-    );
-  });
+// ─────────────────────────────────────────────────────────────
+// HistoryScreen — Pokédex-style battle history list
+//
+// Props:
+//   historyList    BattleResult[]
+//   onSelectBattle fn(battle)
+// ─────────────────────────────────────────────────────────────
+const HistoryScreen = ({ historyList = [], onSelectBattle }) => {
+  const WINNER_COLORS = {
+    'Mistral AI': { color: '#9060f0', bg: '#1a0a30' },
+    'Cohere AI':  { color: '#f05020', bg: '#300a0a' },
+  };
 
   return (
-    <div className="w-full max-w-[1280px] mx-auto px-6 py-8 select-none">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h2 className="font-heading font-black text-2xl tracking-wider text-white uppercase flex items-center gap-2">
-            <span>Simulation Log Logs</span>
-            <span className="text-neon-purple">⚔️</span>
-          </h2>
-          <p className="text-xs text-gray-400 mt-1">
-            Browse and reload previous code battles and Gemini verdicts.
-          </p>
+    <div style={{ padding: '16px', maxWidth: 900, margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{ marginBottom: 20, textAlign: 'center' }}>
+        <div style={{
+          fontFamily: 'var(--px-font)',
+          fontSize: 14,
+          color: 'var(--poke-yellow)',
+          textShadow: '2px 2px 0 #806000',
+          letterSpacing: 3,
+          marginBottom: 8,
+        }}>
+          📜 BATTLE LOG
         </div>
-
-        {/* Search Bar */}
-        <div className="relative w-full md:w-[320px]">
-          <input
-            type="text"
-            placeholder="Search problems or winners..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-black/45 text-sm text-gray-200 placeholder-gray-600 border border-white/5 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:border-neon-purple/50 focus:shadow-[0_0_12px_rgba(139,92,246,0.2)] transition-all duration-300"
-          />
-          {/* Search Icon */}
-          <svg className="absolute left-3.5 top-3 w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+        <div style={{
+          fontFamily: 'var(--px-font)',
+          fontSize: 7,
+          color: '#505878',
+          letterSpacing: 2,
+        }}>
+          {historyList.length} BATTLES RECORDED
         </div>
       </div>
 
-      {/* Grid of battles */}
-      {filteredHistory.length === 0 ? (
-        <div className="w-full border border-white/5 bg-black/25 rounded-2xl p-16 text-center text-gray-600 select-none flex flex-col items-center justify-center">
-          <svg className="w-16 h-16 mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-          </svg>
-          <h4 className="font-heading text-sm font-bold tracking-widest uppercase text-gray-400">
-            No Records Found
-          </h4>
-          <p className="text-xs text-gray-500 mt-1 max-w-[280px]">
-            {searchQuery 
-              ? `No logs match the keyword "${searchQuery}". Try searching for another term.` 
-              : "No battles have been fought yet. Go to Battle Arena to start a new simulation!"}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredHistory.map((battle) => {
-            const isWinnerMistral = battle.winner === 'Mistral AI';
-            const winnerBorderClass = isWinnerMistral 
-              ? 'border-l-4 border-l-electric-cyan glow-border-cyan glass-card-cyan' 
-              : 'border-l-4 border-l-battle-red glow-border-red glass-card-red';
-            
-            return (
-              <div
-                key={battle.id}
-                onClick={() => onSelectBattle(battle)}
-                className={`flex flex-col justify-between rounded-xl p-5 cursor-pointer transform hover:-translate-y-1 hover:scale-[1.01] transition-all duration-300 ${winnerBorderClass}`}
-              >
-                {/* Card Top: Prompt and Date */}
-                <div>
-                  <div className="flex items-center justify-between mb-3 text-[10px] text-gray-500 font-mono">
-                    <span>ID: #{battle.id.substring(0, 8)}</span>
-                    <span>{battle.date}</span>
-                  </div>
-                  <h4 className="text-sm font-semibold text-gray-200 line-clamp-3 leading-relaxed mb-4">
-                    "{battle.prompt}"
-                  </h4>
-                </div>
-
-                {/* Card Bottom: Winner and scores */}
-                <div className="border-t border-white/5 pt-4 flex flex-col gap-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-widest font-heading">WINNER</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-gold-winner text-xs animate-pulse">🏆</span>
-                      <span className={`font-heading font-black text-xs uppercase tracking-wide ${
-                        isWinnerMistral ? 'text-electric-cyan glow-text-cyan' : 'text-battle-red glow-text-red'
-                      }`}>
-                        {battle.winner}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center text-[10px]">
-                    <span className="text-gray-500">Combat Scores:</span>
-                    <div className="flex gap-2 font-mono font-bold text-gray-300">
-                      <span className={isWinnerMistral ? 'text-electric-cyan' : ''}>
-                        M: {battle.judge?.scores?.mistral ?? battle.mistral?.score}%
-                      </span>
-                      <span className="text-gray-600">/</span>
-                      <span className={!isWinnerMistral ? 'text-battle-red' : ''}>
-                        C: {battle.judge?.scores?.cohere ?? battle.cohere?.score}%
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      {/* Empty state */}
+      {historyList.length === 0 && (
+        <div style={{
+          textAlign: 'center',
+          padding: '60px 20px',
+          fontFamily: 'var(--px-font)',
+          fontSize: 9,
+          color: '#404060',
+          lineHeight: 3,
+        }}>
+          No battles yet!<br />
+          Go fight someone!
         </div>
       )}
+
+      {/* Battle list */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {historyList.map((battle, i) => {
+          const wc = WINNER_COLORS[battle.winner] || { color: '#a0a8d8', bg: '#101028' };
+          const mScore = battle.judge?.scores?.mistral || battle.mistral?.score || 0;
+          const cScore = battle.judge?.scores?.cohere  || battle.cohere?.score  || 0;
+
+          return (
+            <button
+              key={battle.id}
+              id={`history-item-${battle.id}`}
+              onClick={() => onSelectBattle?.(battle)}
+              style={{
+                background: '#0f0f28',
+                border: `3px solid var(--box-border)`,
+                borderLeft: `5px solid ${wc.color}`,
+                borderRadius: 8,
+                padding: '12px 14px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.15s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                animation: `slide-up-in 0.3s ease-out ${i * 0.05}s both`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#141430';
+                e.currentTarget.style.borderColor = wc.color;
+                e.currentTarget.style.transform = 'translateX(4px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#0f0f28';
+                e.currentTarget.style.borderColor = 'var(--box-border)';
+                e.currentTarget.style.borderLeftColor = wc.color;
+                e.currentTarget.style.transform = 'none';
+              }}
+            >
+              {/* Battle number */}
+              <div style={{
+                fontFamily: 'var(--px-font)',
+                fontSize: 8,
+                color: '#404060',
+                minWidth: 28,
+              }}>
+                #{String(historyList.length - i).padStart(3, '0')}
+              </div>
+
+              {/* Prompt */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontFamily: 'var(--px-font)',
+                  fontSize: 8,
+                  color: '#ffffff',
+                  marginBottom: 5,
+                  letterSpacing: 0.5,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {battle.prompt}
+                </div>
+                <div style={{
+                  fontFamily: 'var(--px-font)',
+                  fontSize: 7,
+                  color: '#505878',
+                  letterSpacing: 1,
+                }}>
+                  {battle.date}
+                </div>
+              </div>
+
+              {/* Scores */}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <ScorePill label="M" score={mScore} color="#9060f0" />
+                <span style={{ fontFamily: 'var(--px-font)', fontSize: 8, color: '#404060' }}>vs</span>
+                <ScorePill label="C" score={cScore} color="#f05020" />
+              </div>
+
+              {/* Winner badge */}
+              <div style={{
+                background: wc.bg,
+                border: `2px solid ${wc.color}`,
+                borderRadius: 6,
+                padding: '4px 8px',
+                fontFamily: 'var(--px-font)',
+                fontSize: 7,
+                color: wc.color,
+                whiteSpace: 'nowrap',
+                letterSpacing: 0.5,
+              }}>
+                {battle.winner === 'Mistral AI' ? 'MISTRAL 🏆' : 'COHERE 🏆'}
+              </div>
+
+              <div style={{ color: '#404060', fontSize: 12 }}>▶</div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };
+
+const ScorePill = ({ label, score, color }) => (
+  <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 2,
+  }}>
+    <span style={{ fontFamily: 'var(--px-font)', fontSize: 6, color: '#505878' }}>{label}</span>
+    <span style={{ fontFamily: 'var(--px-font)', fontSize: 9, color }}>
+      {score}
+    </span>
+  </div>
+);
 
 export default HistoryScreen;
